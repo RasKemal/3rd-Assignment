@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 sendBroadcast(intent);
             }
         } else if(sensorEvent.sensor.getType() == Sensor.TYPE_LIGHT) {
-            if(sensorEvent.values[0] < 16000){
+            if(sensorEvent.values[0] < 12000){
                 text.setText("Akıllı telefon cepte.");
                 acc.setTextColor(Color.parseColor("#ffffff"));
                 text.setTextColor(Color.parseColor("#ffffff"));
