@@ -3,7 +3,10 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -12,6 +15,9 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.BreakIterator;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -36,9 +42,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
 
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Intent intent = new Intent();
+        Intent intent = new Intent("com.kemalselcuk.action");
 
 
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
@@ -46,9 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 acc.setText("Hareketsiz.");
             }else {
                 acc.setText("Hareketli.");
-                intent.setAction("com.kemalselcuk.moving");
-                intent.putExtra("message","phone is moving.");
-                intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+                intent.putExtra("com.kemalselcuk.EXTRA_TEXT", "moving");
                 sendBroadcast(intent);
             }
         } else if(sensorEvent.sensor.getType() == Sensor.TYPE_LIGHT) {
@@ -57,11 +62,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 acc.setTextColor(Color.parseColor("#ffffff"));
                 text.setTextColor(Color.parseColor("#ffffff"));
                 view.setBackgroundColor(Color.parseColor("#1d2671"));
-                intent.setAction("com.kemalselcuk.dark");
-                intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-                intent.putExtra("message","phone is in pocket.");
-                sendBroadcast(intent);
             }else{
+                intent.putExtra("com.kemalselcuk.EXTRA_TEXT", "on table");
+                sendBroadcast(intent);
                 text.setText("Akıllı telefon masada.");
                 text.setTextColor(Color.parseColor("#000000"));
                 acc.setTextColor(Color.parseColor("#000000"));
@@ -70,8 +73,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String receivedText = intent.getStringExtra("com.kemalselcuk.EXTRA_TEXT");
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter("com.kemalselcuk.action");
+        registerReceiver(broadcastReceiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(broadcastReceiver);
+    }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
+
 }
